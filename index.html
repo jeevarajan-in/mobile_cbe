@@ -152,13 +152,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var
 .mark-att-body{padding:1rem 1.5rem;overflow-y:auto;flex:1;min-height:0;}
 .mark-att-search{width:100%;padding:.5rem .75rem .5rem 2.2rem;border:1px solid var(--border-strong);border-radius:8px;font-family:inherit;font-size:.85rem;color:var(--text-primary);background:var(--surface2);outline:none;}
 .mark-att-search:focus{border-color:var(--gold);}
-.mark-att-stats{display:flex;gap:12px;padding:.75rem 0;border-bottom:1px solid var(--border);margin-bottom:.75rem;}
-.mark-att-stat{font-size:.78rem;font-weight:600;}
-.mark-att-item{display:flex;align-items:center;gap:10px;padding:.6rem .75rem;border-radius:8px;cursor:pointer;transition:background .12s;border:1px solid transparent;}
+.mark-att-stats{display:flex;flex-wrap:wrap;gap:6px 10px;padding:.6rem 0;border-bottom:1px solid var(--border);margin-bottom:.75rem;align-items:center;}
+.mark-att-stat{font-size:.76rem;font-weight:600;white-space:nowrap;}
+.mark-att-item{display:flex;align-items:center;gap:8px;padding:.6rem .75rem;border-radius:8px;cursor:pointer;transition:background .12s;border:1px solid transparent;flex-wrap:nowrap;}
 .mark-att-item:hover{background:var(--gold-pale);}
 .mark-att-item.checked{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.2);}
 .mark-att-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
 .mark-att-item.checked .mark-att-check{background:#4ADE80;border-color:#4ADE80;}
+.mark-att-info{flex:1;min-width:0;}
+.mark-att-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;}
 .mark-group-btn{border:none;background:none;font-family:inherit;font-size:.75rem;font-weight:600;color:var(--text-secondary);cursor:pointer;margin-left:6px;}
 .mark-group-btn.on{color:var(--gold);}
 .mark-hh-group{margin-bottom:10px;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
@@ -211,6 +213,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var
 @media(max-width:600px){
   /* Layout */
   .field-row{grid-template-columns:1fr;}
+  /* Keep Date + Service/Event side by side in attendance modal */
+  .mark-att-date-row{grid-template-columns:1fr 1fr !important;}
   .content{padding:.75rem;}
   .topbar{padding:.55rem .75rem;gap:8px;}
 
@@ -531,7 +535,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var
       <span style="color:#4ade80;">●</span> Validated: <span id="mark-att-validated-count" style="font-weight:800;margin:0 2px;">0</span> &nbsp;|&nbsp; <span style="color:#f87171;">●</span> Non-validated members shown in red
     </div>
     <div style="padding:1rem 1.5rem 0;flex-shrink:0;background:var(--surface);">
-      <div class="field-row">
+      <div class="field-row mark-att-date-row">
         <div class="field"><label>Date</label><input id="mark-att-date" type="date" onchange="checkExistingAttRecord()"></div>
         <div class="field"><label>Service / Event</label>
           <select id="mark-att-event" style="width:100%;padding:.55rem .75rem;border:1px solid var(--border-strong);border-radius:8px;font-family:inherit;font-size:.85rem;color:var(--text-primary);background:var(--surface2);outline:none;" onchange="checkExistingAttRecord()">
@@ -548,9 +552,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var
         <span class="mark-att-stat" style="color:#F87171;">Absent: <span id="mark-att-absent">0</span></span>
         <span class="mark-att-stat" style="color:var(--text-secondary);">Total: <span id="mark-att-total">0</span></span>
         <div style="flex:1"></div>
-        <button onclick="markAllPresent()" style="border:none;background:none;font-family:inherit;font-size:.75rem;font-weight:600;color:var(--gold);cursor:pointer;">Select All</button>
-        <button onclick="markAllAbsent()" style="border:none;background:none;font-family:inherit;font-size:.75rem;font-weight:600;color:var(--text-secondary);cursor:pointer;margin-left:6px;">Clear All</button>
-        <button onclick="toggleMarkGroup()" id="mark-group-btn" class="mark-group-btn">Group by family</button>
+        <button onclick="markAllPresent()" style="border:none;background:none;font-family:inherit;font-size:.72rem;font-weight:600;color:var(--gold);cursor:pointer;white-space:nowrap;">Select All</button>
+        <button onclick="markAllAbsent()" style="border:none;background:none;font-family:inherit;font-size:.72rem;font-weight:600;color:var(--text-secondary);cursor:pointer;margin-left:4px;white-space:nowrap;">Clear All</button>
+        <button onclick="toggleMarkGroup()" id="mark-group-btn" class="mark-group-btn" style="white-space:nowrap;">Group by family</button>
       </div>
     </div>
     <div style="padding:.5rem 1.5rem .75rem;flex-shrink:0;background:var(--surface);display:flex;gap:8px;align-items:center;">
@@ -1277,18 +1281,19 @@ function markMemberRow(m){
   return `<div class="mark-att-item ${checked?'checked':''}" style="${validationBorder}" onclick="toggleAttMember('${m._docId}')">
     <div class="mark-att-check">${checked?MARK_CHECK_SVG:''}</div>
     ${avatarHtml(m,32)}
-    <div style="flex:1"><div style="font-weight:600;font-size:.85rem;">${m.name}${hhTag}</div><div style="font-size:.72rem;color:var(--slate-light);">${m.id||''} ${m.ministry?'· '+m.ministry:''}</div></div>
-    <div onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" style="margin-right:6px;">
-    <select ${venueDisabled} onchange="setMemberVenue('${m._docId}',this.value)" style="border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:.72rem;font-weight:600;font-family:inherit;cursor:${checked?'pointer':'not-allowed'};outline:none;background:${dropBg};color:${dropColor};min-width:96px;opacity:${venueOpacity};transition:opacity .2s;">
-      <option value="" ${!mv?'selected':''}>📍 Venue</option>
-      <option value="city" ${citySel} style="color:var(--blue);">🏙 City</option>
-      <option value="airport" ${airSel} style="color:var(--purple);">✈ Airport</option>
-    </select>
+    <div class="mark-att-info">
+      <div style="font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}${hhTag}</div>
+      <div style="font-size:.72rem;color:var(--slate-light);">${m.id||''}${m.ministry?' · '+m.ministry:''}</div>
     </div>
-    <span class="badge ${checked?'badge-active':'badge-inactive'}" style="font-size:.68rem;">${checked?'Present':'Absent'}</span>
-    <div onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" style="display:flex;gap:4px;margin-left:4px;">
-      <button class="action-btn admin-only" onclick="openMemberEditSheet('${m._docId}')" style="font-size:.68rem;padding:.22rem .5rem;">Edit</button>
-      <button class="action-btn admin-only" onclick="archiveMemberFromAtt('${m._docId}')" style="font-size:.68rem;padding:.22rem .5rem;color:var(--red);border-color:rgba(248,113,113,.4);">Archive</button>
+    <div class="mark-att-actions" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">
+      <select ${venueDisabled} onchange="setMemberVenue('${m._docId}',this.value)" style="border:1px solid var(--border-strong);border-radius:6px;padding:3px 5px;font-size:.68rem;font-weight:600;font-family:inherit;cursor:${checked?'pointer':'not-allowed'};outline:none;background:${dropBg};color:${dropColor};max-width:78px;opacity:${venueOpacity};transition:opacity .2s;">
+        <option value="" ${!mv?'selected':''}>📍</option>
+        <option value="city" ${citySel} style="color:var(--blue);">🏙 City</option>
+        <option value="airport" ${airSel} style="color:var(--purple);">✈ Airport</option>
+      </select>
+      <span class="badge ${checked?'badge-active':'badge-inactive'}" style="font-size:.65rem;white-space:nowrap;">${checked?'Present':'Absent'}</span>
+      <button class="action-btn admin-only" onclick="openMemberEditSheet('${m._docId}')" style="font-size:.65rem;padding:.2rem .45rem;">Edit</button>
+      <button class="action-btn admin-only" onclick="archiveMemberFromAtt('${m._docId}')" style="font-size:.65rem;padding:.2rem .45rem;color:var(--red);border-color:rgba(248,113,113,.4);">Archive</button>
     </div>
   </div>`;
 }
