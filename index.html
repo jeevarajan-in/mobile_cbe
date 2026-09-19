@@ -264,6 +264,27 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var
   .login-card{padding:1.75rem 1rem;}
 }
 /* Visitor modal: match app_cbe label style (no uppercase, no letter-spacing) */
+.visitor-modal {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.45);
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow: hidden;
+}
+.visitor-modal .visitor-modal-body {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 1.25rem 1.5rem;
+}
+@media (max-width: 500px) {
+  .visitor-modal { max-height: 92vh; border-radius: 12px; }
+  .visitor-modal .field-row { grid-template-columns: 1fr; }
+}
 .visitor-modal .field label {
   text-transform: none;
   letter-spacing: 0;
@@ -607,7 +628,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var
 
 <!-- VISITOR QUICK-CAPTURE MODAL -->
 <div class="overlay" id="visitor-overlay" onclick="if(event.target===this)closeVisitor()">
-  <div class="modal visitor-modal" style="max-width:440px;">
+  <div class="modal visitor-modal">
     <div class="modal-head">
       <span class="modal-head-title">Welcome New Comer</span>
       <button onclick="exportNewComers()" title="Export New Comers list" style="display:flex;align-items:center;gap:5px;padding:.3rem .75rem;border-radius:7px;border:1px solid rgba(212,168,71,.4);background:rgba(212,168,71,.1);color:var(--gold);font-family:inherit;font-size:.72rem;font-weight:700;cursor:pointer;margin-right:6px;transition:all .15s;" onmouseover="this.style.background='rgba(212,168,71,.2)'" onmouseout="this.style.background='rgba(212,168,71,.1)'">
@@ -616,7 +637,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--navy);color:var
       </button>
       <button class="modal-close" onclick="closeVisitor()"><svg width="12" height="12" fill="none" viewBox="0 0 12 12"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     </div>
-    <div style="padding:1.25rem 1.5rem;">
+    <div class="visitor-modal-body">
       <div style="font-size:.8rem;color:var(--slate-light);margin-bottom:1rem;">Quick capture at the door. Saves as a <b style="color:var(--text-primary)">New Comer</b> with a follow-up next step so they don't fall through.</div>
       <div class="field-row" style="align-items:flex-start;">
         <div class="field" style="flex:2;"><label>Name *</label><input id="v-name" placeholder="Full name" onkeydown="if(event.key==='Enter')document.getElementById('v-phone').focus()" oninput="clearVFieldErr('v-name-err','v-name')"><div id="v-name-err" style="display:none;font-size:.72rem;color:#ef4444;margin-top:4px;font-weight:600;"></div></div>
